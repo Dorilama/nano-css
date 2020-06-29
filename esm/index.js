@@ -47,6 +47,7 @@ function tag(t) {
 /**
  *
  * Given a statement as a template string add it, but only once
+ * Use this tag to add global CSS
  * @param {TemplateStringsArray} template
  * @param  {...any} values
  */
@@ -76,8 +77,56 @@ export let css = (template, ...values) => {
   if (cache[str]) return " " + cache[str];
   let key = hash(str);
   cache[str] = key;
-  let ruleset = `.${key}{${str}}`;
-  add(ruleset);
+  /**
+   * The big assumtion here is the order of the statements
+   * - First: declarations of the basic ruleset to be applied
+   *   with the basic class selector witout braces to delimit the block.
+   * - Second: rulesets with combinators, pseudo classes
+   *   and pseudo elements. Use the ampersand "&" to refer
+   *   to the current class selector.
+   *   Use braces to delimit the blocks.
+   * - Third: at-rules statements. Use the ampersand "&"
+   *   to refer to the current class selector.
+   *   Use braces to delimit the blocks,
+   *   also for ruleset to be applied with the basic class selector.
+   *
+   * I.e. css`color: red;
+   * background: yellow;
+   * & > *{
+   * color: purple;
+   * }
+   * &:hover{
+   * color: #fff;
+   * }
+   * &::before{
+   * color:black;
+   * }
+   * @media (max-width: 30em) {
+   * &{color:red;}
+   * &:hover{color:blue;}
+   * }
+   * @supports (display: flex) {
+   * & { display: flex; }
+   * }
+   * `
+   */
+  //
+  // - First: declarations of the basic ruleset directly
+  let [rules, ...atRules] = str.split("@");
+  if (rules) {
+    let [baseRule, ...etRules] = rules.split("&");
+    baseRule && add(`.${key}{${baseRule}}`);
+    etRules.map((r) => add("." + key + r));
+  }
+  atRules.map((r) => add("@" + r.replace(/&/g, "." + key)));
 
   return " " + key;
+};
+
+/**
+ * helper function to reset raw and cache
+ */
+export const reset = () => {
+  raw = "";
+  cache = [];
 };
