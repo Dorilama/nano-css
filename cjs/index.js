@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.glob = exports.add = exports.getRaw = exports.hash = void 0;
+exports.css = exports.glob = exports.add = exports.getRaw = exports.hash = void 0;
 
 /**
  * Hash function from https://github.com/darkskyapp/string-hash
@@ -72,5 +72,27 @@ let glob = (template, ...values) => {
   cache[key] = true;
   add(str);
 };
+/**
+ * Given a string with CSS declarations
+ * create a ruleset, add it and return the selector
+ * @param {TemplateStringsArray} template
+ * @param  {...any} values
+ * @returns {string}
+ */
+
 
 exports.glob = glob;
+
+let css = (template, ...values) => {
+  let str = tag(template, ...values); // if str is empty or null or undefined
+  // there is nothing to do.
+  // return an empty string as selector
+
+  if (!str) return "";
+  let key = hash(str);
+  let ruleset = `.${key}{${str}}`;
+  add(ruleset);
+  return key;
+};
+
+exports.css = css;
