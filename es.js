@@ -1,1 +1,1 @@
-self.nanoCss=function(t){"use strict";let r="";return t.add=t=>{r+=t},t.getRaw=()=>r,t.hash=t=>{let r=5381,e=t.length;for(;e;)r=33*r^t.charCodeAt(--e);return"_"+(r>>>0).toString(36)},t}({}).default;
+self.nanoCss=function(t){"use strict";const e=t=>{let e=5381,r=t.length;for(;r;)e=33*e^t.charCodeAt(--r);return"_"+(e>>>0).toString(36)};let r="",n={};let o=t=>{r+=t};return t.add=o,t.getRaw=()=>r,t.glob=t=>{if(!t)return;let r=e(t);n[r]||(n[r]=!0,o(t))},t.hash=e,t}({}).default;
