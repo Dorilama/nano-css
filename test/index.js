@@ -169,3 +169,63 @@ test("pseudo and at-rules", (t) => {
   // testCssRaw(t,'','','')
   t.end();
 });
+
+test("clean string", (t) => {
+  reset();
+  testCssRaw(
+    t,
+    `
+  /* comment */
+  color:red;
+  & > * {
+    color: red;
+  }
+  /* comment*/
+  @media screen {
+    body {
+      /* comment */
+      width: 75%;
+    }
+    & {
+      color: red;
+    }
+    & > * {
+      color: red;
+    }
+  }`,
+    "._3bxd6l{color:red;}._3bxd6l > * {color: red;}@media screen {body {width: 75%;}._3bxd6l {color: red;}._3bxd6l > * {color: red;}}",
+    " _3bxd6l"
+  );
+  testCssRaw(
+    t,
+    `color:red;
+  background:yellow;`,
+    "._i4gj9d{color:red;background:yellow;}",
+    " _i4gj9d"
+  );
+  testCssRaw(
+    t,
+    `color:red;
+
+
+  background:yellow;
+  /* ok */`,
+    "",
+    " _i4gj9d"
+  );
+  // testCssRaw(t,'','','')
+  t.end();
+});
+
+test("block name", (t) => {
+  reset();
+  testCssRaw(t, "/*red*/color:red;", ".red{color:red;}", " red");
+  testCssRaw(t, "color:red;", "", " red");
+  testCssRaw(t, "\n/*blue*/color:blue;", ".blue{color:blue;}", " blue");
+  css`
+    color: green;
+  `;
+  testCssRaw(t, "/*green*/color: green;", "", " _5m1q2q");
+  // testCssRaw(t,'','','')
+  t.end();
+});

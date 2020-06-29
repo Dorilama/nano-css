@@ -60,6 +60,17 @@ var nanoCss = (function (exports) {
   };
 
   /**
+   * look for a class name in a comment at the first line
+   * default is a noop
+   * @param {string} s
+   */
+  let lookForName = (s) => {
+    let [$0, $1, $2] = /^\/\*(.*)\*\/|^\n\/\*(.*)\*\//.exec(s) || [];
+    console.log("###########", s, $1, $2);
+    return $1 || $2;
+  };
+
+  /**
    * Given a string with CSS declarations
    * create a ruleset, add it and return the selector
    * @param {TemplateStringsArray} template
@@ -68,15 +79,22 @@ var nanoCss = (function (exports) {
    */
   let css = (template, ...values) => {
     let str = tag(template, ...values);
+
     // if str is empty or null or undefined
     // there is nothing to do.
     // return an empty string as selector
     if (!str) return "";
+    let key = lookForName(str);
+
+    // remove comments, double or more spaces, line feed
+    str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, "");
+
     // if str is in the cache it has been added already
     // just return the cached selector with a leading space
     if (cache[str]) return " " + cache[str];
-    let key = hash(str);
+    key = key || hash(str);
     cache[str] = key;
+
     /**
      * The big assumtion here is the order of the statements
      * - First: declarations of the basic ruleset to be applied
