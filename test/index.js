@@ -76,15 +76,15 @@ test("basic css", (t) => {
   testCssRaw(t, "", "", "");
   testCssRaw(t, null, "", "");
   testCssRaw(t, undefined, "", "");
-  testCssRaw(t, "color: #000;", "._4e6eq2{color: #000;}", "_4e6eq2");
-  // testCssRaw(t, "color: #000;", "", "_4e6eq2", "again");
+  testCssRaw(t, "color: #000;", "._4e6eq2{color: #000;}", " _4e6eq2");
+  testCssRaw(t, "color: #000;", "", " _4e6eq2", "again");
   testCssRaw(
     t,
     "color: black;background: red;",
     "._1ry8j36{color: black;background: red;}",
-    "_1ry8j36"
+    " _1ry8j36"
   );
-  // testCssRaw(t, "color: #000;", "", "_4e6eq2", "again 2");
+  testCssRaw(t, "color: #000;", "", " _4e6eq2", "again 2");
   // testCssRaw(t,'','','')
   // testCssRaw(t,'','','')
   t.end();

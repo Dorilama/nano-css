@@ -65,11 +65,10 @@ function tag(t) {
 
 
 let glob = (template, ...values) => {
-  let str = tag(template, ...values);
-  let key = hash(str); // if the hash of str is in the cache it has been added already, there is nothing to do
+  let str = tag(template, ...values); // if the str is in the cache it has been added already, there is nothing to do
 
-  if (cache[key]) return;
-  cache[key] = true;
+  if (cache[str]) return;
+  cache[str] = true;
   add(str);
 };
 /**
@@ -88,11 +87,15 @@ let css = (template, ...values) => {
   // there is nothing to do.
   // return an empty string as selector
 
-  if (!str) return "";
+  if (!str) return ""; // if str is in the cache it has been added already
+  // just return the cached selector with a leading space
+
+  if (cache[str]) return " " + cache[str];
   let key = hash(str);
+  cache[str] = key;
   let ruleset = `.${key}{${str}}`;
   add(ruleset);
-  return key;
+  return " " + key;
 };
 
 exports.css = css;
