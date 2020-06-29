@@ -1,4 +1,4 @@
-let { hash, getRaw, add, glob } = require("../cjs");
+let { hash, getRaw, add, glob, s, dummyTag } = require("../cjs");
 var test = require("tape");
 
 // hash test from https://github.com/darkskyapp/string-hash
@@ -27,19 +27,19 @@ test("basic add", (t) => {
 
 test("basic glob", (t) => {
   let currentRaw = getRaw();
-  glob("");
+  glob``;
   t.equal(getRaw(), currentRaw, `glob null`);
-  glob(null);
+  glob`${null}`;
   t.equal(getRaw(), currentRaw, `glob undefined`);
-  glob(undefined);
+  glob`${undefined}`;
   t.equal(getRaw(), currentRaw, `glob ""`);
-  glob("hello ");
+  glob`hello `;
   t.equal(getRaw(), currentRaw + "hello ", `glob "hello "`);
-  glob("hello ");
+  glob`hello${" "}`;
   t.equal(getRaw(), currentRaw + "hello ", `glob "hello " again`);
-  glob("world");
+  glob`world`;
   t.equal(getRaw(), currentRaw + "hello " + "world", `glob "world"`);
-  glob("hello ");
+  glob`hello `;
   t.equal(getRaw(), currentRaw + "hello " + "world", `glob "hello " again 2`);
   t.end();
 });
