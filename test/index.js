@@ -1,36 +1,6 @@
 let { hash, getRaw, add, glob, css, reset } = require("../cjs");
 var test = require("tape");
-
-/**
- *
- * @param {import('tape').Test} t
- * @param {undefined|null|string} value
- * @param {string} expectedValue
- * @param {selector} expectedSelector
- * @param {string} [message]
- */
-const testCssRaw = (
-  t,
-  value,
-  expectedValue,
-  expectedSelector,
-  message = ""
-) => {
-  let currentRaw = getRaw();
-  let selector = css`
-    ${value}
-  `;
-  t.equal(
-    getRaw(),
-    currentRaw + expectedValue,
-    `css raw - "${value}"${message ? " - " + message : ""}`
-  );
-  t.equal(
-    selector,
-    expectedSelector,
-    `css selector - "${value}"${message ? " - " + message : ""}`
-  );
-};
+const { testCssRaw } = require("./helpers_nt");
 
 // hash test from https://github.com/darkskyapp/string-hash
 test("hash test", (t) => {

@@ -1,30 +1,8 @@
 let { getRaw, css, reset, setup } = require("../cjs");
 var test = require("tape");
+const { testCssRaw } = require("./helpers_nt");
 
 setup({ getKey: true });
-
-const testCssRaw = (
-  t,
-  value,
-  expectedValue,
-  expectedSelector,
-  message = ""
-) => {
-  let currentRaw = getRaw();
-  let selector = css`
-    ${value}
-  `;
-  t.equal(
-    getRaw(),
-    currentRaw + expectedValue,
-    `css raw - "${value}"${message ? " - " + message : ""}`
-  );
-  t.equal(
-    selector,
-    expectedSelector,
-    `css selector - "${value}"${message ? " - " + message : ""}`
-  );
-};
 
 test("block name", (t) => {
   reset();
