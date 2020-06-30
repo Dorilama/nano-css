@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reset = exports.css = exports.glob = exports.add = exports.getRaw = exports.hash = void 0;
+exports.reset = exports.setup = exports.css = exports.glob = exports.add = exports.getRaw = exports.hash = void 0;
 
 /**
  * Hash function from https://github.com/darkskyapp/string-hash
@@ -25,6 +25,7 @@ exports.hash = hash;
 const client = typeof window === "object";
 let raw = "",
     cache = {},
+    keys = {},
     sh;
 /**
  * Get the raw string of all the statements added
@@ -52,7 +53,7 @@ let add = str => {
 exports.add = add;
 
 function tag(t) {
-  for (var s = t[0], i = 1, l = arguments.length; i < l; i++) s += arguments[i] || "" + t[i];
+  for (var s = t[0], i = 1, l = arguments.length; i < l; i++) s += (arguments[i] || "") + t[i];
 
   return s;
 }
@@ -66,25 +67,14 @@ function tag(t) {
 
 
 let glob = (template, ...values) => {
-  let str = tag(template, ...values); // if the str is in the cache it has been added already, there is nothing to do
+  let str = tag(template, ...values); // remove comments, double or more spaces, line feed
+
+  str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, "");
+  if (!str) return; // if the str is in the cache it has been added already, there is nothing to do
 
   if (cache[str]) return;
-  cache[str] = true;
+  cache[str] = 1;
   add(str);
-};
-/**
- * look for a class name in a comment at the first line
- * default is a noop
- * @param {string} s
- */
-
-
-exports.glob = glob;
-
-let lookForName = s => {
-  let [$0, $1, $2] = /^\/\*(.*)\*\/|^\n\/\*(.*)\*\//.exec(s) || [];
-  console.log("###########", s, $1, $2);
-  return $1 || $2;
 };
 /**
  * Given a string with CSS declarations
@@ -95,56 +85,32 @@ let lookForName = s => {
  */
 
 
+exports.glob = glob;
+
 let css = (template, ...values) => {
-  let str = tag(template, ...values); // if str is empty or null or undefined
+  let str = tag(template, ...values);
+  let key = css.getKey(str); // remove comments, double or more spaces, line feed
+
+  str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, ""); // if str is empty or null or undefined
   // there is nothing to do.
   // return an empty string as selector
 
-  if (!str) return "";
-  let key = lookForName(str); // remove comments, double or more spaces, line feed
-
-  str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, ""); // if str is in the cache it has been added already
+  if (!str) return ""; // if str is in the cache it has been added already
   // just return the cached selector with a leading space
 
   if (cache[str]) return " " + cache[str];
-  key = key || hash(str);
-  cache[str] = key;
-  /**
-   * The big assumtion here is the order of the statements
-   * - First: declarations of the basic ruleset to be applied
-   *   with the basic class selector witout braces to delimit the block.
-   * - Second: rulesets with combinators, pseudo classes
-   *   and pseudo elements. Use the ampersand "&" to refer
-   *   to the current class selector.
-   *   Use braces to delimit the blocks.
-   * - Third: at-rules statements. Use the ampersand "&"
-   *   to refer to the current class selector.
-   *   Use braces to delimit the blocks,
-   *   also for ruleset to be applied with the basic class selector.
-   *
-   * I.e. css`color: red;
-   * background: yellow;
-   * & > *{
-   * color: purple;
-   * }
-   * &:hover{
-   * color: #fff;
-   * }
-   * &::before{
-   * color:black;
-   * }
-   * @media (max-width: 30em) {
-   * &{color:red;}
-   * &:hover{color:blue;}
-   * }
-   * @supports (display: flex) {
-   * & { display: flex; }
-   * }
-   * `
-   */
-  //
-  // - First: declarations of the basic ruleset directly
 
+  if (key) {
+    if (keys[key]) {
+      throw `Class name ${key} used more than once`;
+    } else {
+      keys[key] = 1;
+    }
+  } else {
+    key = hash(str);
+  }
+
+  cache[str] = key;
   let [rules, ...atRules] = str.split("@");
 
   if (rules) {
@@ -157,15 +123,41 @@ let css = (template, ...values) => {
   return " " + key;
 };
 /**
- * helper function to reset raw and cache
+ * look for a class name in a comment at the first line
+ * default to noop
+ * @param {string} s
  */
 
 
 exports.css = css;
 
+css.getKey = s => null;
+/**
+ * Optional setup
+ * @param {{getKey?: boolean}} options
+ */
+
+
+const setup = options => {
+  const {
+    getKey
+  } = options;
+  getKey && (css.getKey = s => {
+    let e = /^\n*\s*\/\*\s*key=(.*)\s*\*\//.exec(s);
+    return e ? e[1] : null;
+  });
+};
+/**
+ * helper function to reset raw, cache and keys
+ */
+
+
+exports.setup = setup;
+
 const reset = () => {
   raw = "";
-  cache = [];
+  cache = {};
+  keys = {};
 };
 
 exports.reset = reset;

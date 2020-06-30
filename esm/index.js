@@ -18,6 +18,7 @@ const client = typeof window === "object";
 
 let raw = "",
   cache = {},
+  keys = {},
   sh;
 
 /**
@@ -40,7 +41,7 @@ export let add = (str) => {
  */
 function tag(t) {
   for (var s = t[0], i = 1, l = arguments.length; i < l; i++)
-    s += arguments[i] || "" + t[i];
+    s += (arguments[i] || "") + t[i];
   return s;
 }
 
@@ -53,19 +54,13 @@ function tag(t) {
  */
 export let glob = (template, ...values) => {
   let str = tag(template, ...values);
+  // remove comments, double or more spaces, line feed
+  str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, "");
+  if (!str) return;
   // if the str is in the cache it has been added already, there is nothing to do
   if (cache[str]) return;
-  cache[str] = true;
+  cache[str] = 1;
   add(str);
-};
-
-/**
- * look for a class name in a comment at the first line
- * @param {string} s
- */
-let lookForName = (s) => {
-  let [$0, $1, $2] = /^\/\*(.*)\*\/|^\n\/\*(.*)\*\//.exec(s) || [];
-  return $1 || $2;
 };
 
 /**
@@ -78,56 +73,30 @@ let lookForName = (s) => {
 export let css = (template, ...values) => {
   let str = tag(template, ...values);
 
-  // if str is empty or null or undefined
-  // there is nothing to do.
-  // return an empty string as selector
-  if (!str) return "";
-  let key = lookForName(str);
+  let key = css.getKey(str);
 
   // remove comments, double or more spaces, line feed
   str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, "");
 
+  // if str is empty or null or undefined
+  // there is nothing to do.
+  // return an empty string as selector
+  if (!str) return "";
+
   // if str is in the cache it has been added already
   // just return the cached selector with a leading space
   if (cache[str]) return " " + cache[str];
-  key = key || hash(str);
+  if (key) {
+    if (keys[key]) {
+      throw `Class name ${key} used more than once`;
+    } else {
+      keys[key] = 1;
+    }
+  } else {
+    key = hash(str);
+  }
   cache[str] = key;
 
-  /**
-   * The big assumtion here is the order of the statements
-   * - First: declarations of the basic ruleset to be applied
-   *   with the basic class selector witout braces to delimit the block.
-   * - Second: rulesets with combinators, pseudo classes
-   *   and pseudo elements. Use the ampersand "&" to refer
-   *   to the current class selector.
-   *   Use braces to delimit the blocks.
-   * - Third: at-rules statements. Use the ampersand "&"
-   *   to refer to the current class selector.
-   *   Use braces to delimit the blocks,
-   *   also for ruleset to be applied with the basic class selector.
-   *
-   * I.e. css`color: red;
-   * background: yellow;
-   * & > *{
-   * color: purple;
-   * }
-   * &:hover{
-   * color: #fff;
-   * }
-   * &::before{
-   * color:black;
-   * }
-   * @media (max-width: 30em) {
-   * &{color:red;}
-   * &:hover{color:blue;}
-   * }
-   * @supports (display: flex) {
-   * & { display: flex; }
-   * }
-   * `
-   */
-  //
-  // - First: declarations of the basic ruleset directly
   let [rules, ...atRules] = str.split("@");
   if (rules) {
     let [baseRule, ...etRules] = rules.split("&");
@@ -140,9 +109,30 @@ export let css = (template, ...values) => {
 };
 
 /**
- * helper function to reset raw and cache
+ * look for a class name in a comment at the first line
+ * default to noop
+ * @param {string} s
+ */
+css.getKey = (s) => null;
+
+/**
+ * Optional setup
+ * @param {{getKey?: boolean}} options
+ */
+export const setup = (options) => {
+  const { getKey } = options;
+  getKey &&
+    (css.getKey = (s) => {
+      let e = /^\n*\s*\/\*\s*key=(.*)\s*\*\//.exec(s);
+      return e ? e[1] : null;
+    });
+};
+
+/**
+ * helper function to reset raw, cache and keys
  */
 export const reset = () => {
   raw = "";
-  cache = [];
+  cache = {};
+  keys = {};
 };

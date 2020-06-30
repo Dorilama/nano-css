@@ -1,5 +1,8 @@
-let { hash, getRaw, add, glob, css, reset } = require("../cjs");
+let { hash, getRaw, add, glob, css, reset, setup } = require("../cjs");
 var test = require("tape");
+
+setup({ getKey: true });
+
 /**
  *
  * @param {import('tape').Test} t
@@ -16,7 +19,9 @@ const testCssRaw = (
   message = ""
 ) => {
   let currentRaw = getRaw();
-  let selector = css(["", ""], value);
+  let selector = css`
+    ${value}
+  `;
   t.equal(
     getRaw(),
     currentRaw + expectedValue,
@@ -70,6 +75,18 @@ test("basic glob", (t) => {
   t.equal(getRaw(), currentRaw + "hello " + "world", `glob "world"`);
   glob`hello `;
   t.equal(getRaw(), currentRaw + "hello " + "world", `glob "hello " again 2`);
+  currentRaw = getRaw();
+  glob`
+  :root {
+
+    /* comment*/
+    --color:red;
+  }`;
+  t.equal(
+    getRaw(),
+    currentRaw + ":root {--color:red;}",
+    `glob remove comments and white space`
+  );
   t.end();
 });
 
@@ -207,7 +224,6 @@ test("clean string", (t) => {
     t,
     `color:red;
 
-
   background:yellow;
   /* ok */`,
     "",
@@ -219,13 +235,21 @@ test("clean string", (t) => {
 
 test("block name", (t) => {
   reset();
-  testCssRaw(t, "/*red*/color:red;", ".red{color:red;}", " red");
-  testCssRaw(t, "color:red;", "", " red");
-  testCssRaw(t, "\n/*blue*/color:blue;", ".blue{color:blue;}", " blue");
+  testCssRaw(t, "/*key=red*/color:red;", ".red{color:red;}", " red");
+  testCssRaw(t, "/* comment */color:red;", "", " red");
+  testCssRaw(t, "\n/* key=blue*/color:blue;", ".blue{color:blue;}", " blue");
   css`
     color: green;
   `;
-  testCssRaw(t, "/*green*/color: green;", "", " _5m1q2q");
+  testCssRaw(t, "/*     key=green    */color: green;", "", " _5m1q2q");
+  t.throws(
+    () =>
+      css`
+        /*key=red*/
+        color: orange;
+      `
+  );
+  t.comment(getRaw());
   // testCssRaw(t,'','','')
   t.end();
 });
