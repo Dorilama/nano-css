@@ -10,7 +10,7 @@
     "rollup:index": "rollup --config rollup/index.config.js",
     "fix:default": "sed -i 's/({})/({}).default/' index.js && sed -i 's/({})/({}).default/' es.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "test": "nyc node test/index.js | tap-nyc"
+    "test": "find test/*.js -exec nyc --no-clean --reporter=html --reporter=text tape {} + | tap-nyc"
   },
   "keywords": [],
   "author": "dorilama",
