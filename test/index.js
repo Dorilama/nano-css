@@ -1,8 +1,6 @@
 let { hash, getRaw, add, glob, css, reset, setup } = require("../cjs");
 var test = require("tape");
 
-setup({ getKey: true });
-
 /**
  *
  * @param {import('tape').Test} t
@@ -233,6 +231,8 @@ test("clean string", (t) => {
   t.end();
 });
 
+setup({ getKey: true });
+
 test("block name", (t) => {
   reset();
   testCssRaw(t, "/*key=red*/color:red;", ".red{color:red;}", " red");
@@ -249,7 +249,6 @@ test("block name", (t) => {
         color: orange;
       `
   );
-  t.comment(getRaw());
   // testCssRaw(t,'','','')
   t.end();
 });

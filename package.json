@@ -10,7 +10,7 @@
     "rollup:index": "rollup --config rollup/index.config.js",
     "fix:default": "sed -i 's/({})/({}).default/' index.js && sed -i 's/({})/({}).default/' es.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "test": "nyc node test/index.js"
+    "test": "nyc node test/index.js | tap-nyc"
   },
   "keywords": [],
   "author": "dorilama",
@@ -21,6 +21,7 @@
     "rollup": "^2.18.1",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-terser": "^6.1.0",
+    "tap-nyc": "^1.0.3",
     "tape": "^5.0.1",
     "ucjs": "^0.1.1"
   },
