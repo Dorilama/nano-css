@@ -14,18 +14,26 @@ export const hash = (str) => {
   return "_" + (hash >>> 0).toString(36);
 };
 
-const client = typeof window === "object";
+let client = typeof window === "object";
 
-let raw = "",
-  cache = {},
-  keys = {},
-  sh;
+let raw = "";
+let cache = {};
+let keys = {};
 
 /**
  * Get the raw string of all the statements added
  * @returns {string} The raw string of all the statements added
  */
 export const getRaw = () => raw;
+
+/**
+ * helper function to reset raw, cache and keys
+ */
+export const reset = () => {
+  raw = "";
+  cache = {};
+  keys = {};
+};
 
 /**
  * Given a statements as a string add it to raw
@@ -86,15 +94,10 @@ export let css = (template, ...values) => {
   // if str is in the cache it has been added already
   // just return the cached selector with a leading space
   if (cache[str]) return " " + cache[str];
-  if (key) {
-    if (keys[key]) {
-      throw `Class name ${key} used more than once`;
-    } else {
-      keys[key] = 1;
-    }
-  } else {
+  if (!key || keys[key]) {
     key = hash(str);
   }
+  keys[key] = 1;
   cache[str] = key;
 
   let [rules, ...atRules] = str.split("@");
@@ -117,22 +120,34 @@ css.getKey = (s) => null;
 
 /**
  * Optional setup
- * @param {{getKey?: boolean}} options
+ * @param {{getKey?: boolean, isDev?: boolean}} options
  */
-export const setup = (options) => {
-  const { getKey } = options;
-  getKey &&
-    (css.getKey = (s) => {
-      let e = /^\n*\s*\/\*\s*key=(.*)\s*\*\//.exec(s);
-      return e ? e[1] : null;
-    });
-};
-
-/**
- * helper function to reset raw, cache and keys
- */
-export const reset = () => {
-  raw = "";
-  cache = {};
-  keys = {};
+export const setup = (options = {}) => {
+  const { getKey, isDev } = options;
+  if (getKey) {
+    let r = /^\n*\s*\/\*\s*key=(\S*)\s*\*\//;
+    if (isDev) {
+      css.getKey = (s) => {
+        let e = r.exec(s);
+        if (e) {
+          if (keys[e[1]]) {
+            throw `Key ${e[1]} used more than once`;
+          } else {
+            return e[1];
+          }
+        }
+        return null;
+      };
+    } else {
+      css.getKey = (s) => {
+        let e = r.exec(s);
+        return e ? e[1] : null;
+      };
+    }
+  }
+  // getKey &&
+  //   (css.getKey = (s) => {
+  //     let e = r.exec(s);
+  //     return e ? e[1] : null;
+  //   });
 };

@@ -11,7 +11,7 @@
     "fix:default": "sed -i 's/({})/({}).default/' index.js && sed -i 's/({})/({}).default/' es.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "test:clean": "nyc --silent node test/clean_nt.js",
-    "test:all": "find test/*js ! -name \"*_nt.js\" -exec nyc --no-clean node {} \\; | tap-nyc",
+    "test:all": "find test/*js ! -name \"*_nt.js\" -exec nyc --no-clean --silent node {} \\; | tap-nyc",
     "test:report": " nyc report --reporter=lcov --reporter=text --reporter=html",
     "test": "npm run test:clean && npm run test:all && npm run test:report"
   },

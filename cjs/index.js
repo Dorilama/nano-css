@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reset = exports.setup = exports.css = exports.glob = exports.add = exports.getRaw = exports.hash = void 0;
+exports.setup = exports.css = exports.glob = exports.add = exports.reset = exports.getRaw = exports.hash = void 0;
 
 /**
  * Hash function from https://github.com/darkskyapp/string-hash
@@ -22,11 +22,10 @@ const hash = str => {
 };
 
 exports.hash = hash;
-const client = typeof window === "object";
-let raw = "",
-    cache = {},
-    keys = {},
-    sh;
+let client = typeof window === "object";
+let raw = "";
+let cache = {};
+let keys = {};
 /**
  * Get the raw string of all the statements added
  * @returns {string} The raw string of all the statements added
@@ -34,12 +33,24 @@ let raw = "",
 
 const getRaw = () => raw;
 /**
+ * helper function to reset raw, cache and keys
+ */
+
+
+exports.getRaw = getRaw;
+
+const reset = () => {
+  raw = "";
+  cache = {};
+  keys = {};
+};
+/**
  * Given a statements as a string add it to raw
  * @param {string} str The string to add
  */
 
 
-exports.getRaw = getRaw;
+exports.reset = reset;
 
 let add = str => {
   raw += str;
@@ -100,16 +111,11 @@ let css = (template, ...values) => {
 
   if (cache[str]) return " " + cache[str];
 
-  if (key) {
-    if (keys[key]) {
-      throw `Class name ${key} used more than once`;
-    } else {
-      keys[key] = 1;
-    }
-  } else {
+  if (!key || keys[key]) {
     key = hash(str);
   }
 
+  keys[key] = 1;
   cache[str] = key;
   let [rules, ...atRules] = str.split("@");
 
@@ -134,30 +140,45 @@ exports.css = css;
 css.getKey = s => null;
 /**
  * Optional setup
- * @param {{getKey?: boolean}} options
+ * @param {{getKey?: boolean, isDev?: boolean}} options
  */
 
 
-const setup = options => {
+const setup = (options = {}) => {
   const {
-    getKey
+    getKey,
+    isDev
   } = options;
-  getKey && (css.getKey = s => {
-    let e = /^\n*\s*\/\*\s*key=(.*)\s*\*\//.exec(s);
-    return e ? e[1] : null;
-  });
-};
-/**
- * helper function to reset raw, cache and keys
- */
 
+  if (getKey) {
+    let r = /^\n*\s*\/\*\s*key=(\S*)\s*\*\//;
+
+    if (isDev) {
+      css.getKey = s => {
+        let e = r.exec(s);
+
+        if (e) {
+          if (keys[e[1]]) {
+            throw `Key ${e[1]} used more than once`;
+          } else {
+            return e[1];
+          }
+        }
+
+        return null;
+      };
+    } else {
+      css.getKey = s => {
+        let e = r.exec(s);
+        return e ? e[1] : null;
+      };
+    }
+  } // getKey &&
+  //   (css.getKey = (s) => {
+  //     let e = r.exec(s);
+  //     return e ? e[1] : null;
+  //   });
+
+};
 
 exports.setup = setup;
-
-const reset = () => {
-  raw = "";
-  cache = {};
-  keys = {};
-};
-
-exports.reset = reset;

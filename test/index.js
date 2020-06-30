@@ -1,7 +1,9 @@
-let { hash, getRaw, add, glob, css, reset } = require("../cjs");
+let { hash, getRaw, add, glob, css, reset, setup } = require("../cjs");
 var test = require("tape");
 const { testCssRaw } = require("./helpers_nt");
 
+// run setup without options for coverage
+setup();
 // hash test from https://github.com/darkskyapp/string-hash
 test("hash test", (t) => {
   t.equal(

@@ -140,7 +140,7 @@ will produce
 }
 ```
 
-We can add a comment before the declarations to specify a class name to use in the statement instead of the generated hash. The comment is in the form `/* key=classname */`
+We can add a comment before the declarations to specify a class name to use in the statement instead of the generated hash. The comment is in the form `/* key=classname */`. The class name is not modified so it must be a valid class name.
 To use the comment class we need to call `setup` with the `getKey` option set to true.
 I.e.
 
