@@ -22,7 +22,6 @@ const hash = str => {
 };
 
 exports.hash = hash;
-let client = typeof window === "object";
 let raw = "";
 let cache = {};
 let keys = {};
@@ -54,14 +53,18 @@ exports.reset = reset;
 
 let add = str => {
   raw += str;
+  add.insert(str);
 };
+
+exports.add = add;
+
+add.insert = str => {};
+
+add.isDev = false;
 /**
  * Template literal without coercing null, undefined and false to string
  * @param {TemplateStringsArray} t
  */
-
-
-exports.add = add;
 
 function tag(t) {
   for (var s = t[0], i = 1, l = arguments.length; i < l; i++) s += (arguments[i] || "") + t[i];
@@ -138,6 +141,35 @@ let css = (template, ...values) => {
 exports.css = css;
 
 css.getKey = s => null;
+
+let client = typeof window === "object";
+let sh = null;
+
+if (client) {
+  sh =
+  /**@type {HTMLStyleElement} */
+  document.querySelector("style[data-nano-css-lama]");
+
+  if (!sh) {
+    sh = document.createElement("style");
+    document.head.appendChild(sh);
+    sh.setAttribute("data-nano-css-lama", "");
+  }
+
+  let sheet = sh.sheet;
+
+  add.insert = str => {
+    try {
+      sheet.insertRule(str, sheet.cssRules.length);
+    } catch (err) {
+      if (add.isDev) {
+        throw err;
+      } else {
+        console.log(err);
+      }
+    }
+  };
+}
 /**
  * Optional setup
  * @param {{getKey?: boolean, isDev?: boolean}} options
@@ -149,6 +181,10 @@ const setup = (options = {}) => {
     getKey,
     isDev
   } = options;
+
+  if (isDev) {
+    add.isDev = isDev;
+  }
 
   if (getKey) {
     let r = /^\n*\s*\/\*\s*key=(\S*)\s*\*\//;
@@ -173,12 +209,7 @@ const setup = (options = {}) => {
         return e ? e[1] : null;
       };
     }
-  } // getKey &&
-  //   (css.getKey = (s) => {
-  //     let e = r.exec(s);
-  //     return e ? e[1] : null;
-  //   });
-
+  }
 };
 
 exports.setup = setup;

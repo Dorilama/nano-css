@@ -42,7 +42,11 @@ var nanoCss = (function (exports) {
    */
   let add = (str) => {
     raw += str;
+    add.insert(str);
   };
+
+  add.insert = (str) => {};
+  add.isDev = false;
 
   /**
    * Template literal without coercing null, undefined and false to string
@@ -119,12 +123,41 @@ var nanoCss = (function (exports) {
    */
   css.getKey = (s) => null;
 
+  let client = typeof window === "object";
+  let sh = null;
+
+  if (client) {
+    sh = /**@type {HTMLStyleElement} */ (document.querySelector(
+      "style[data-nano-css-lama]"
+    ));
+    if (!sh) {
+      sh = document.createElement("style");
+      document.head.appendChild(sh);
+      sh.setAttribute("data-nano-css-lama", "");
+    }
+    let sheet = sh.sheet;
+    add.insert = (str) => {
+      try {
+        sheet.insertRule(str, sheet.cssRules.length);
+      } catch (err) {
+        if (add.isDev) {
+          throw err;
+        } else {
+          console.log(err);
+        }
+      }
+    };
+  }
+
   /**
    * Optional setup
    * @param {{getKey?: boolean, isDev?: boolean}} options
    */
   const setup = (options = {}) => {
     const { getKey, isDev } = options;
+    if (isDev) {
+      add.isDev = isDev;
+    }
     if (getKey) {
       let r = /^\n*\s*\/\*\s*key=(\S*)\s*\*\//;
       if (isDev) {
@@ -146,11 +179,6 @@ var nanoCss = (function (exports) {
         };
       }
     }
-    // getKey &&
-    //   (css.getKey = (s) => {
-    //     let e = r.exec(s);
-    //     return e ? e[1] : null;
-    //   });
   };
 
   exports.add = add;
