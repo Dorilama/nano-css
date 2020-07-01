@@ -4,6 +4,8 @@ CSS in Js inspired by [nano-css](https://github.com/streamich/nano-css).
 
 Currently it produces class names, a raw CSS string and injects the styles in the page.
 
+It also hydrate ssr styles.
+
 It doesn't parse the declarations and it doesn't autoprefix the styles.
 
 ---

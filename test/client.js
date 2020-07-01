@@ -72,7 +72,6 @@ const testCss = (t, value, expected) => {
     }
   });
 };
-// const testInsert()
 
 test("basics", (t) => {
   t.equal(style.tagName, "STYLE");

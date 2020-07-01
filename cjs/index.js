@@ -25,6 +25,7 @@ exports.hash = hash;
 let raw = "";
 let cache = {};
 let keys = {};
+let hydrated = {};
 /**
  * Get the raw string of all the statements added
  * @returns {string} The raw string of all the statements added
@@ -42,6 +43,7 @@ const reset = () => {
   raw = "";
   cache = {};
   keys = {};
+  hydrated = {};
 };
 /**
  * Given a statements as a string add it to raw
@@ -120,6 +122,7 @@ let css = (template, ...values) => {
 
   keys[key] = 1;
   cache[str] = key;
+  if (hydrated["." + key]) return " " + key;
   let [rules, ...atRules] = str.split("@");
 
   if (rules) {
@@ -154,6 +157,23 @@ if (client) {
     sh = document.createElement("style");
     document.head.appendChild(sh);
     sh.setAttribute("data-nano-css-lama", "");
+  } else {
+    // hydrate
+    for (let r of sh.sheet.cssRules) {
+      let {
+        selectorText,
+        cssText,
+        type
+      } =
+      /**@type {CSSRule & {selectorText ?: string}} */
+      r;
+
+      if (type === 1 && selectorText !== ":root") {
+        hydrated[selectorText] = 1;
+      } else {
+        cache[cssText] = 1;
+      }
+    }
   }
 
   let sheet = sh.sheet;
