@@ -113,21 +113,21 @@ test("at-rules", (t) => {
   reset();
   testCssRaw(
     t,
-    "color: #000;@media (max-width: 30em) { &{color:red;} }",
-    "._12l4pns{color: #000;}@media (max-width: 30em) { ._12l4pns{color:red;} }",
-    " _12l4pns"
+    "color: #000;@media only screen and (max-width: 30em) { &{color:red;} }",
+    "._kjg4l7{color: #000;}@media only screen and (max-width: 30em) { ._kjg4l7{color:red;} }",
+    " _kjg4l7"
   );
   testCssRaw(
     t,
-    "color: #000;@media (max-width: 30em) { &{color:red;} }@media (max-width: 3em) { &{color:red;} }",
-    "._hzw522{color: #000;}@media (max-width: 30em) { ._hzw522{color:red;} }@media (max-width: 3em) { ._hzw522{color:red;} }",
-    " _hzw522"
+    "color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }",
+    "._19azkq{color: #000;}@media only screen and (max-width: 30em) { ._19azkq{color:red;} }@media only screen and (max-width: 3em) { ._19azkq{color:red;} }",
+    " _19azkq"
   );
   testCssRaw(
     t,
-    "@media (max-width: 30em) { &{color:red;} }",
-    "@media (max-width: 30em) { ._1e2mo6f{color:red;} }",
-    " _1e2mo6f"
+    "@media only screen and (max-width: 30em) { &{color:red;} }",
+    "@media only screen and (max-width: 30em) { ._es36t0{color:red;} }",
+    " _es36t0"
   );
   // testCssRaw(t,'','','')
   t.end();
@@ -137,27 +137,27 @@ test("pseudo and at-rules", (t) => {
   reset();
   testCssRaw(
     t,
-    "color:red;&>*{color:blue;}@media (max-width: 30em) { &{color:red;} }",
-    "._2nsavy{color:red;}._2nsavy>*{color:blue;}@media (max-width: 30em) { ._2nsavy{color:red;} }",
-    " _2nsavy"
+    "color:red;&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }",
+    "._76csy5{color:red;}._76csy5>*{color:blue;}@media only screen and (max-width: 30em) { ._76csy5{color:red;} }",
+    " _76csy5"
   );
   testCssRaw(
     t,
-    "color:red;&>*{color:blue;}&>p{color:blue;}@media (max-width: 30em) { &{color:red;} }@media (max-width: 3em) { &{color:red;} }",
-    "._19tl7r4{color:red;}._19tl7r4>*{color:blue;}._19tl7r4>p{color:blue;}@media (max-width: 30em) { ._19tl7r4{color:red;} }@media (max-width: 3em) { ._19tl7r4{color:red;} }",
-    " _19tl7r4"
+    "color:red;&>*{color:blue;}&>p{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }",
+    "._8zudfk{color:red;}._8zudfk>*{color:blue;}._8zudfk>p{color:blue;}@media only screen and (max-width: 30em) { ._8zudfk{color:red;} }@media only screen and (max-width: 3em) { ._8zudfk{color:red;} }",
+    " _8zudfk"
   );
   testCssRaw(
     t,
-    "&>*{color:blue;}@media (max-width: 30em) { &{color:red;} }",
-    "._17krno1>*{color:blue;}@media (max-width: 30em) { ._17krno1{color:red;} }",
-    " _17krno1"
+    "&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }",
+    "._1pk4sua>*{color:blue;}@media only screen and (max-width: 30em) { ._1pk4sua{color:red;} }",
+    " _1pk4sua"
   );
   testCssRaw(
     t,
-    "color:red;&>*{color:blue;}@media (max-width: 30em) { &{color:red;} &>*{color:purple;} }",
-    "._1uxwnw8{color:red;}._1uxwnw8>*{color:blue;}@media (max-width: 30em) { ._1uxwnw8{color:red;} ._1uxwnw8>*{color:purple;} }",
-    " _1uxwnw8"
+    "color:red;&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} &>*{color:purple;} }",
+    "._hd1xez{color:red;}._hd1xez>*{color:blue;}@media only screen and (max-width: 30em) { ._hd1xez{color:red;} ._hd1xez>*{color:purple;} }",
+    " _hd1xez"
   );
   // testCssRaw(t,'','','')
   t.end();

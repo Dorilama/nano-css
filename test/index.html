@@ -1,19 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>nano-css</title>
-  <script type="module">
-  import(
-    /^(?:localhost|[::1]|127(?:.d+){3})$/.test(location.hostname) ?
-    '../esm/index.js' :
-    'https://unpkg.com/nano-css?module'
-  )
-  .then((module) => {
-    console.log(module);
-  });
-  </script>
-</head>
-<body></body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>nano-css</title>
+    <script type="module">
+      import(
+        /^(?:localhost|[::1]|127(?:.d+){3})$/.test(location.hostname)
+          ? "../esm/index.js"
+          : "https://unpkg.com/nano-css?module"
+      ).then((module) => {
+        const { add, glob, css } = module;
+        const target = document.querySelector("#target");
+        const sheet = document.querySelector("style[data-nano-css-lama").sheet;
+        const colors = {
+          red: "rgb(255, 0, 0)",
+          black: "rgb(0, 0, 0)",
+          blue: "rgb(128, 0, 128)",
+          yellow: "rgb(255, 255, 0)",
+          purple: "rgb(128, 0, 128)",
+        };
+        let passed = true;
+        let failed = [];
+        let n = 0;
+        const getLastRule = () =>
+          sheet.cssRules[sheet.cssRules.length - 1].cssText;
+        const isEqual = (value, expected, msg) => {
+          if (expected === value) {
+            console.log(`${n}. ${msg} |-> OK`);
+          } else {
+            console.error(
+              `${n}. ${msg} |-> expected: ${expected} real: ${value}`
+            );
+            passed = false;
+            failed.push(`${n}.  ${msg}`);
+          }
+          n += 1;
+        };
+        const test = (className, computed, pseudo) => {
+          target.className = className;
+          Object.entries(computed).forEach(([prop, expected]) => {
+            const value = window.getComputedStyle(target, pseudo)[prop];
+            isEqual(value, expected, `${className} - ${prop}`);
+          });
+        };
+        // basics
+        isEqual(typeof sheet, "object", "typeof sheet");
+        add(":root{--pad:1rem}");
+        isEqual(
+          window.getComputedStyle(target).getPropertyValue("--pad"),
+          "1rem",
+          "add :root custom property"
+        );
+        console.info(
+          "You should see a logged error after this. Something like a DOMException"
+        );
+        add("h1");
+        // TODO!!! test that adding a wrong rule throws in dev mode
+
+        // glob
+        let last = getLastRule();
+        glob``;
+        isEqual(getLastRule(), last, "global empty string");
+        glob`${null}`;
+        isEqual(getLastRule(), last, "global null");
+        glob`${undefined}`;
+        isEqual(getLastRule(), last, "global undefined");
+        glob`:root{--space:2rem;}`;
+        isEqual(
+          window.getComputedStyle(target).getPropertyValue("--space"),
+          "2rem",
+          "glob :root custom property"
+        );
+        glob`   /* comment */ ${null} :root{--pad2:2rem;/*comment*/ ${undefined}}`;
+        isEqual(
+          window.getComputedStyle(target).getPropertyValue("--pad2"),
+          "2rem",
+          "glob clean rule"
+        );
+        last = getLastRule();
+        glob`:root{--space:2rem;}`;
+        isEqual(getLastRule(), last, "global cached statement");
+
+        // css
+        last = getLastRule();
+        css``;
+        isEqual(getLastRule(), last, "css empty string");
+        css`
+          ${null}
+        `;
+        isEqual(getLastRule(), last, "css null");
+        css`
+          ${undefined}
+        `;
+        isEqual(getLastRule(), last, "css undefined");
+        css`
+          color: red;
+        `;
+        test("_gq0ykq", { color: colors.red });
+        last = getLastRule();
+        css`
+          color: red;
+        `;
+        isEqual(getLastRule(), last, "css cache");
+        css`
+          ${"color: red; background: yellow;"}
+        `;
+        test("_18mx869", {
+          color: colors.red,
+          "background-color": colors.yellow,
+        });
+        css`
+          color: yellow;
+          &:before {
+            color: purple;
+          }
+        `;
+        test("_1ep4ua4", { color: colors.yellow });
+        test("_1ep4ua4", { color: colors.purple }, ":before");
+        css`
+          &:before {
+            color: blue;
+          }
+        `;
+        test("_1ep4ua4", { color: colors.blue }, ":before");
+        css`
+          color: #000;
+          @media only screen and (min-width: 1rem) {
+            & {
+              color: red;
+            }
+          }
+        `;
+        test("_1g995qd", { color: colors.red });
+        css`
+          color: red;
+          background: yellow;
+          & > * {
+            color: purple;
+          }
+          &:hover {
+            color: #fff;
+          }
+          &::before {
+            color: black;
+          }
+          @media only screen and (max-width: 30em) {
+            & {
+              color: red;
+            }
+            &:hover {
+              color: blue;
+            }
+          }
+          @supports (display: flex) {
+            & {
+              display: flex;
+            }
+          }
+        `;
+        //for(r of document.querySelector('style').sheet.cssRules){console.log(r.cssText)}
+        // end of tests
+        console.log(
+          `\n\nAll test are done. the result is: ${
+            passed ? "Passed" : "Failed"
+          }!`
+        );
+        const result = document.querySelector("#result");
+        if (passed) {
+          result.innerText = "All tests passed!";
+          result.style = "color:green; font-weight: bold;";
+        } else {
+          result.innerText = "Some tests failed! Check the console.";
+          result.style = "color:red; font-weight: bold;";
+          console.log("\n\nHere are the failed tests:");
+          failed.forEach((v) => console.log(v));
+        }
+        console.log("\n\nHere is the injected css");
+        for (let r of document.querySelector("style").sheet.cssRules) {
+          console.log(r.cssText);
+          if (r.type === 4) {
+            console.log(r.media);
+          }
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <h1>@dorilama/nano-css</h1>
+    <p>Test page</p>
+    <p id="result">Tests are running</p>
+    <div id="target"></div>
+  </body>
 </html>

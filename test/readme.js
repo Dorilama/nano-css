@@ -40,33 +40,33 @@ test("readme examples", (t) => {
   testCssRaw(
     t,
     `
-    color: red;
-    background: yellow;
-    & > * {
-      color: purple;
+  color: red;
+  background: yellow;
+  & > * {
+    color: purple;
+  }
+  &:hover {
+    color: #fff;
+  }
+  &::before {
+    color: black;
+  }
+  @media only screen and (max-width: 30em) {
+    & {
+      color: red;
     }
     &:hover {
-      color: #fff;
+      color: blue;
     }
-    &::before {
-      color: black;
+  }
+  @supports (display: flex) {
+    & {
+      display: flex;
     }
-    @media (max-width: 30em) {
-      & {
-        color: red;
-      }
-      &:hover {
-        color: blue;
-      }
-    }
-    @supports (display: flex) {
-      & {
-        display: flex;
-      }
-    }
-  `,
-    "._129w8u4{color: red;background: yellow;}._129w8u4 > * {color: purple;}._129w8u4:hover {color: #fff;}._129w8u4::before {color: black;}@media (max-width: 30em) {._129w8u4 {color: red;}._129w8u4:hover {color: blue;}}@supports (display: flex) {._129w8u4 {display: flex;}}",
-    " _129w8u4"
+  }
+`,
+    "._bb2r2n{color: red;background: yellow;}._bb2r2n > * {color: purple;}._bb2r2n:hover {color: #fff;}._bb2r2n::before {color: black;}@media only screen and (max-width: 30em) {._bb2r2n {color: red;}._bb2r2n:hover {color: blue;}}@supports (display: flex) {._bb2r2n {display: flex;}}",
+    " _bb2r2n"
   );
   reset();
   testCssRaw(

@@ -6,13 +6,13 @@ let ssrSelectors = [
   ["color: black; background: red;", "._1ry8j36"],
   ["color: #000;", "._djyl69"],
   ["color: yellow;", "._djyl69:before"],
-  ["color: #000;", "._hzw522"],
-  ["(max-width: 30em)", [["color: red;", "._hzw522"]]],
-  ["(max-width: 3em)", [["color: red;", "._hzw522"]]],
+  ["color: #000;", "._19azkq"],
+  ["only screen and (max-width: 30em)", [["color: red;", "._19azkq"]]],
+  ["only screen and (max-width: 3em)", [["color: red;", "._19azkq"]]],
   ["color: red;", "._1uxwnw8"],
   ["color: blue;", "._1uxwnw8>*"],
   [
-    "(max-width: 30em)",
+    "only screen and (max-width: 30em)",
     [
       ["color: red;", "._1uxwnw8"],
       ["color: purple;", "._1uxwnw8>*"],
@@ -78,18 +78,26 @@ test("don't add hydrated styles", (t) => {
   let last = getLastRule();
   let selector;
   glob`:root {--pad: 1rem;}`;
-  t.equal(getLastRule(), last);
+  t.equal(getLastRule(), last, `should be hydrated :root`);
   selector = css`
     color: #000;
   `;
-  t.equal(getLastRule(), last, `should be hydrated ${selector}`);
+  t.equal(getLastRule(), last, `should be hydrated ${selector} - color: #000;`);
   selector = css`
     ${"color: black;background: red;"}
   `;
-  t.equal(getLastRule(), last, `should be hydrated ${selector}`);
+  t.equal(
+    getLastRule(),
+    last,
+    `should be hydrated ${selector} - color: black;background: red;`
+  );
   selector = css`
-    ${"color: #000;@media (max-width: 30em) { &{color:red;} }@media (max-width: 3em) { &{color:red;} }"}
+    ${"color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }"}
   `;
-  t.equal(getLastRule(), last, `should be hydrated ${selector}`);
+  t.equal(
+    getLastRule(),
+    last,
+    `should be hydrated ${selector} - color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }`
+  );
   t.end();
 });

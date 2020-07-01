@@ -4,9 +4,11 @@ CSS in Js inspired by [nano-css](https://github.com/streamich/nano-css).
 
 Currently it produces class names, a raw CSS string and injects the styles in the page.
 
-It also hydrate ssr styles.
+It also support ssr hydration.
 
 It doesn't parse the declarations and it doesn't autoprefix the styles.
+
+It is mainly a learning project.
 
 ---
 
@@ -93,7 +95,7 @@ css`
   &::before {
     color: black;
   }
-  @media (max-width: 30em) {
+  @media only screen and (max-width: 30em) {
     & {
       color: red;
     }
@@ -112,29 +114,29 @@ css`
 will produce
 
 ```css
-._129w8u4 {
+._bb2r2n {
   color: red;
   background: yellow;
 }
-._129w8u4 > * {
+._bb2r2n > * {
   color: purple;
 }
-._129w8u4:hover {
+._bb2r2n:hover {
   color: #fff;
 }
-._129w8u4::before {
+._bb2r2n::before {
   color: black;
 }
-@media (max-width: 30em) {
-  ._129w8u4 {
+@media only screen and (max-width: 30em) {
+  ._bb2r2n {
     color: red;
   }
-  ._129w8u4:hover {
+  ._bb2r2n:hover {
     color: blue;
   }
 }
 @supports (display: flex) {
-  ._129w8u4 {
+  ._bb2r2n {
     display: flex;
   }
 }
@@ -169,7 +171,7 @@ console.log(className);
 // expected output: " _gq0ykq"
 ```
 
-At this point styles are cached after stripping comments, double or more spaces and line feed. Single spaces are kept.
+Styles are cached after stripping comments, double or more spaces and line feed. Single spaces are kept.
 I.e.
 
 ```javascript
@@ -191,3 +193,7 @@ console.log(c1 === c2); // true
 console.log(c1 === c3); // false - there is no space between ":" and "red"
 console.log(c1 === c4); // false - the semicolon is missing
 ```
+
+Ssr hydration is automatic and targets a `style` element with `data-nano-css-lama` attribute.
+
+The `glob` and `css` template literal tags don't coerce `null`, `undefined` and `false` to string. Theese values get replaced by an empty string.

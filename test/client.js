@@ -136,57 +136,65 @@ test("css", (t) => {
   testCss(t, `&:before{color:purple;}`, [
     ["color: purple;", "._1kc5304:before"],
   ]);
-  testCss(t, `color: #000;@media (max-width: 30em) { &{color:red;} }`, [
-    ["color: #000;", "._12l4pns"],
-    ["(max-width: 30em)", [["color: red;", "._12l4pns"]]],
-  ]);
   testCss(
     t,
-    `color: #000;@media (max-width: 30em) { &{color:red;} }@media (max-width: 3em) { &{color:red;} }`,
+    `color: #000;@media only screen and (max-width: 30em) { &{color:red;} }`,
     [
-      ["color: #000;", "._hzw522"],
-      ["(max-width: 30em)", [["color: red;", "._hzw522"]]],
-      ["(max-width: 3em)", [["color: red;", "._hzw522"]]],
-    ]
-  );
-  testCss(t, `@media (max-width: 30em) { &{color:red;} }`, [
-    ["(max-width: 30em)", [["color: red;", "._1e2mo6f"]]],
-  ]);
-  testCss(
-    t,
-    `color:red;&>*{color:blue;}@media (max-width: 30em) { &{color:red;} }`,
-    [
-      ["color: red;", "._2nsavy"],
-      ["color: blue;", "._2nsavy>*"],
-      ["(max-width: 30em)", [["color: red;", "._2nsavy"]]],
+      ["color: #000;", "._kjg4l7"],
+      ["only screen and (max-width: 30em)", [["color: red;", "._kjg4l7"]]],
     ]
   );
   testCss(
     t,
-    `color:red;&>*{color:blue;}&>p{color:blue;}@media (max-width: 30em) { &{color:red;} }@media (max-width: 3em) { &{color:red;} }`,
+    `color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }`,
     [
-      ["color: red;", "._19tl7r4"],
-      ["color: blue;", "._19tl7r4>*"],
-      ["color: blue;", "._19tl7r4>p"],
-      ["(max-width: 30em)", [["color: red;", "._19tl7r4"]]],
-      ["(max-width: 3em)", [["color: red;", "._19tl7r4"]]],
+      ["color: #000;", "._19azkq"],
+      ["only screen and (max-width: 30em)", [["color: red;", "._19azkq"]]],
+      ["only screen and (max-width: 3em)", [["color: red;", "._19azkq"]]],
     ]
   );
-  testCss(t, `&>*{color:blue;}@media (max-width: 30em) { &{color:red;} }`, [
-    ["color: blue;", "._17krno1>*"],
-    ["(max-width: 30em)", [["color: red;", "._17krno1"]]],
+  testCss(t, `@media only screen and (max-width: 30em) { &{color:red;} }`, [
+    ["only screen and (max-width: 30em)", [["color: red;", "._es36t0"]]],
   ]);
   testCss(
     t,
-    `color:red;&>*{color:blue;}@media (max-width: 30em) { &{color:red;} &>*{color:purple;} }`,
+    `color:red;&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }`,
     [
-      ["color: red;", "._1uxwnw8"],
-      ["color: blue;", "._1uxwnw8>*"],
+      ["color: red;", "._76csy5"],
+      ["color: blue;", "._76csy5>*"],
+      ["only screen and (max-width: 30em)", [["color: red;", "._76csy5"]]],
+    ]
+  );
+  testCss(
+    t,
+    `color:red;&>*{color:blue;}&>p{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }`,
+    [
+      ["color: red;", "._8zudfk"],
+      ["color: blue;", "._8zudfk>*"],
+      ["color: blue;", "._8zudfk>p"],
+      ["only screen and (max-width: 30em)", [["color: red;", "._8zudfk"]]],
+      ["only screen and (max-width: 3em)", [["color: red;", "._8zudfk"]]],
+    ]
+  );
+  testCss(
+    t,
+    `&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} }`,
+    [
+      ["color: blue;", "._1pk4sua>*"],
+      ["only screen and (max-width: 30em)", [["color: red;", "._1pk4sua"]]],
+    ]
+  );
+  testCss(
+    t,
+    `color:red;&>*{color:blue;}@media only screen and (max-width: 30em) { &{color:red;} &>*{color:purple;} }`,
+    [
+      ["color: red;", "._hd1xez"],
+      ["color: blue;", "._hd1xez>*"],
       [
-        "(max-width: 30em)",
+        "only screen and (max-width: 30em)",
         [
-          ["color: red;", "._1uxwnw8"],
-          ["color: purple;", "._1uxwnw8>*"],
+          ["color: red;", "._hd1xez"],
+          ["color: purple;", "._hd1xez>*"],
         ],
       ],
     ]
