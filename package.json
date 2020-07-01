@@ -13,7 +13,8 @@
     "test:clean": "nyc --silent node test/clean_nt.js",
     "test:all": "find test/*js ! -name \"*_nt.js\" -exec nyc --no-clean --silent node {} \\; | tap-nyc",
     "test:report": " nyc report --reporter=lcov --reporter=text --reporter=html",
-    "test": "npm run test:clean && npm run test:all && npm run test:report"
+    "test": "npm run test:clean && npm run test:all && npm run test:report",
+    "test:single": "node test/$FILE | tap-nyc"
   },
   "keywords": [],
   "author": "dorilama",

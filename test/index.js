@@ -153,6 +153,12 @@ test("pseudo and at-rules", (t) => {
     "._17krno1>*{color:blue;}@media (max-width: 30em) { ._17krno1{color:red;} }",
     " _17krno1"
   );
+  testCssRaw(
+    t,
+    "color:red;&>*{color:blue;}@media (max-width: 30em) { &{color:red;} &>*{color:purple;} }",
+    "._1uxwnw8{color:red;}._1uxwnw8>*{color:blue;}@media (max-width: 30em) { ._1uxwnw8{color:red;} ._1uxwnw8>*{color:purple;} }",
+    " _1uxwnw8"
+  );
   // testCssRaw(t,'','','')
   t.end();
 });
