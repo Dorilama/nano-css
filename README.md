@@ -1,6 +1,14 @@
-# Under development
-
 CSS in Js inspired by [nano-css](https://github.com/streamich/nano-css).
+
+---
+
+## Disclaimer
+
+This is a demo project for learning purposes.
+
+---
+
+Live example [here](https://codepen.io/dorilama/pen/oNboJxB)
 
 Currently it produces class names, a raw CSS string and injects the styles in the page.
 
