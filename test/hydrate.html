@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>nano-css</title>
+    <style data-nano-css-lama>
+      :root {
+        --pad: 1rem;
+      }
+      ._4e6eq2 {
+        color: #000;
+      }
+      ._1ry8j36 {
+        color: black;
+        background: red;
+      }
+      ._djyl69 {
+        color: #000;
+      }
+      ._djyl69:before {
+        color: yellow;
+      }
+      ._19azkq {
+        color: #000;
+      }
+      @media only screen and (max-width: 30em) {
+        ._19azkq {
+          color: red;
+        }
+      }
+      @media only screen and (max-width: 3em) {
+        ._19azkq {
+          color: red;
+        }
+      }
+      ._1uxwnw8 {
+        color: red;
+      }
+      ._1uxwnw8 > * {
+        color: blue;
+      }
+      @media only screen and (max-width: 30em) {
+        ._1uxwnw8 {
+          color: red;
+        }
+        ._1uxwnw8 > * {
+          color: purple;
+        }
+      }
+    </style>
+    <script type="module">
+      import(
+        /^(?:localhost|[::1]|127(?:.d+){3})$/.test(location.hostname)
+          ? "../esm/index.js"
+          : "https://unpkg.com/nano-css?module"
+      ).then((module) => {
+        const { add, glob, css, setup } = module;
+        const target = document.querySelector("#target");
+        const sheet = document.querySelector("style[data-nano-css-lama").sheet;
+
+        let passed = true;
+        let failed = [];
+        let n = 0;
+        const getLastRule = () =>
+          sheet.cssRules[sheet.cssRules.length - 1].cssText;
+        const isEqual = (value, expected, msg) => {
+          if (expected === value) {
+            console.log(`${n}. ${msg} |-> OK`);
+          } else {
+            console.error(
+              `${n}. ${msg} |-> expected: ${expected} real: ${value}`
+            );
+            passed = false;
+            failed.push(`${n}.  ${msg}`);
+          }
+          n += 1;
+        };
+        let last = getLastRule();
+        let selector;
+        glob`:root { --pad: 1rem; }`;
+        isEqual(getLastRule(), last, `should be hydrated :root`);
+        selector = css`
+          color: #000;
+        `;
+        isEqual(
+          getLastRule(),
+          last,
+          `should be hydrated ${selector} - color: #000;`
+        );
+        selector = css`
+          ${"color: black;background: red;"}
+        `;
+        isEqual(
+          getLastRule(),
+          last,
+          `should be hydrated ${selector} - color: black;background: red;`
+        );
+        selector = css`
+          ${"color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }"}
+        `;
+        isEqual(
+          getLastRule(),
+          last,
+          `should be hydrated ${selector} - color: #000;@media only screen and (max-width: 30em) { &{color:red;} }@media only screen and (max-width: 3em) { &{color:red;} }`
+        );
+
+        // end of tests
+        console.log(
+          `\n\nAll test are done. the result is: ${
+            passed ? "Passed" : "Failed"
+          }!`
+        );
+        const result = document.querySelector("#result");
+        if (passed) {
+          result.innerText = "All tests passed!";
+          result.style = "color:green; font-weight: bold;";
+        } else {
+          result.innerText = "Some tests failed! Check the console.";
+          result.style = "color:red; font-weight: bold;";
+          console.log("\n\nHere are the failed tests:");
+          failed.forEach((v) => console.log(v));
+        }
+        // console.log("\n\nHere is the injected css");
+        // for (let r of document.querySelector("style").sheet.cssRules) {
+        //   console.log(r.cssText);
+        // }
+      });
+    </script>
+  </head>
+  <body>
+    <h1>@dorilama/nano-css</h1>
+    <p>SSR Test page</p>
+    <p id="result">Tests are running</p>
+    <div id="target"></div>
+  </body>
+</html>

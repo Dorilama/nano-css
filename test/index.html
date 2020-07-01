@@ -10,15 +10,16 @@
           ? "../esm/index.js"
           : "https://unpkg.com/nano-css?module"
       ).then((module) => {
-        const { add, glob, css } = module;
+        const { add, glob, css, setup } = module;
         const target = document.querySelector("#target");
         const sheet = document.querySelector("style[data-nano-css-lama").sheet;
         const colors = {
           red: "rgb(255, 0, 0)",
           black: "rgb(0, 0, 0)",
-          blue: "rgb(128, 0, 128)",
+          blue: "rgb(0, 0, 255)",
           yellow: "rgb(255, 255, 0)",
           purple: "rgb(128, 0, 128)",
+          teal: "rgb(0, 128, 128)",
         };
         let passed = true;
         let failed = [];
@@ -56,7 +57,6 @@
           "You should see a logged error after this. Something like a DOMException"
         );
         add("h1");
-        // TODO!!! test that adding a wrong rule throws in dev mode
 
         // glob
         let last = getLastRule();
@@ -123,7 +123,7 @@
             color: blue;
           }
         `;
-        test("_1ep4ua4", { color: colors.blue }, ":before");
+        test("_1mblhj8", { color: colors.blue }, ":before");
         css`
           color: #000;
           @media only screen and (min-width: 1rem) {
@@ -133,33 +133,73 @@
           }
         `;
         test("_1g995qd", { color: colors.red });
+        isEqual(
+          sheet.cssRules[sheet.cssRules.length - 2].cssText,
+          `._1g995qd { color: ${colors.black}; }`,
+          "._1g995qd"
+        );
         css`
-          color: red;
-          background: yellow;
-          & > * {
-            color: purple;
-          }
-          &:hover {
-            color: #fff;
-          }
-          &::before {
-            color: black;
-          }
-          @media only screen and (max-width: 30em) {
+          @media only screen and (min-width: 1rem) {
             & {
-              color: red;
-            }
-            &:hover {
-              color: blue;
-            }
-          }
-          @supports (display: flex) {
-            & {
-              display: flex;
+              color: yellow;
             }
           }
         `;
-        //for(r of document.querySelector('style').sheet.cssRules){console.log(r.cssText)}
+        test("_otfh9", { color: colors.yellow });
+        css`
+          color: red;
+          &:before {
+            color: blue;
+          }
+          @media only screen and (min-width: 1rem) {
+            & {
+              color: yellow;
+            }
+          }
+        `;
+        test("_1hthub7", { color: colors.blue }, ":before");
+        test("_1hthub7", { color: colors.yellow });
+        css`
+          /* comment*/
+          ${undefined}
+          color: red;
+          ${null}
+        `;
+        test("_gq0ykq", { color: colors.red });
+        setup({ getKey: true });
+        css`
+          /* key=teal*/
+          color: teal;
+        `;
+        test("teal", { color: colors.teal });
+        css`
+          /* key=teal*/
+          color: yellow;
+        `;
+        test("_10nr3st", { color: colors.yellow });
+        setup({ getKey: true, isDev: true });
+        let hasThrown = false;
+        try {
+          add("h1");
+        } catch (e) {
+          hasThrown = true;
+        }
+        isEqual(hasThrown, true, "throw in dev mode when injecting bad rules");
+        hasThrown = false;
+        try {
+          css`
+            /* key=teal*/
+            color: yellow;
+          `;
+        } catch (e) {
+          hasThrown = true;
+        }
+        isEqual(
+          hasThrown,
+          true,
+          "throw in dev mode when using same key for a different declaration"
+        );
+
         // end of tests
         console.log(
           `\n\nAll test are done. the result is: ${
@@ -179,9 +219,6 @@
         console.log("\n\nHere is the injected css");
         for (let r of document.querySelector("style").sheet.cssRules) {
           console.log(r.cssText);
-          if (r.type === 4) {
-            console.log(r.media);
-          }
         }
       });
     </script>
