@@ -205,3 +205,8 @@ console.log(c1 === c4); // false - the semicolon is missing
 Ssr hydration is automatic and targets a `style` element with `data-nano-css-lama` attribute.
 
 The `glob` and `css` template literal tags don't coerce `null`, `undefined` and `false` to string. Theese values get replaced by an empty string.
+
+## Security
+
+**This library allow to use arbitrary input as interpolations. User input used as style can lead to CSS injection.**
+Read [here](https://frontarm.com/james-k-nelson/how-can-i-use-css-in-js-securely/) to have an idea of the problem.
