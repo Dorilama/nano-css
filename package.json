@@ -1,6 +1,6 @@
 {
   "name": "@dorilama/nano-css",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CSS in Js inspired by nano-css",
   "main": "./cjs/index.js",
   "scripts": {
