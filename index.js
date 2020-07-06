@@ -207,4 +207,4 @@ var nanoCss = (function (exports) {
 
   return exports;
 
-}({}).default);
+}({}));
