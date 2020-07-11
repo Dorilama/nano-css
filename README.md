@@ -1,5 +1,7 @@
 CSS in Js inspired by [nano-css](https://github.com/streamich/nano-css).
 
+![Travis (.com)](https://img.shields.io/travis/com/Dorilama/nano-css) ![Coveralls github](https://img.shields.io/coveralls/github/Dorilama/nano-css) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/@dorilama/nano-css) ![David](https://img.shields.io/david/Dorilama/nano-css)
+
 ---
 
 ## Disclaimer
