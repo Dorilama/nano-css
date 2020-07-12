@@ -66,10 +66,14 @@
         isEqual(getLastRule(), last, "global null");
         glob`${undefined}`;
         isEqual(getLastRule(), last, "global undefined");
-        glob`:root{--space:2rem;}`;
+        glob`
+          :root {
+            --space: 2rem;
+          }
+        `;
         isEqual(
           window.getComputedStyle(target).getPropertyValue("--space"),
-          "2rem",
+          " 2rem",
           "glob :root custom property"
         );
         glob`   /* comment */ ${null} :root{--pad2:2rem;/*comment*/ ${undefined}}`;
@@ -79,7 +83,11 @@
           "glob clean rule"
         );
         last = getLastRule();
-        glob`:root{--space:2rem;}`;
+        glob`
+          :root {
+            --space: 2rem;
+          }
+        `;
         isEqual(getLastRule(), last, "global cached statement");
 
         // css
@@ -198,6 +206,58 @@
           hasThrown,
           true,
           "throw in dev mode when using same key for a different declaration"
+        );
+        hasThrown = false;
+        try {
+          glob`
+            :root {
+              --space: 2rem;
+            }
+            h1 {
+              color: red;
+              background-color: blue;
+            }
+            @keyframes slidein {
+              from {
+                transform: translateX(0%);
+              }
+
+              to {
+                transform: translateX(100%);
+              }
+            }
+            @keyframes identifier {
+              0% {
+                top: 0;
+              }
+              50% {
+                top: 30px;
+                left: 20px;
+              }
+              50% {
+                top: 10px;
+              }
+              100% {
+                top: 0;
+              }
+            }
+            @media only screen and (max-width: 600px) {
+              body {
+                background-color: lightblue;
+              }
+              h1 {
+                background-color: lightblue;
+              }
+            }
+          `;
+        } catch (e) {
+          console.log(e);
+          hasThrown = true;
+        }
+        isEqual(
+          hasThrown,
+          false,
+          "correctly split and add multiple global ruleset at the same time"
         );
 
         // end of tests

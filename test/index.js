@@ -37,14 +37,30 @@ test("basic glob", (t) => {
   t.equal(getRaw(), currentRaw, `glob undefined`);
   glob`${undefined}`;
   t.equal(getRaw(), currentRaw, `glob ""`);
+  glob`:root { --space: 2rem; }`;
+  t.equal(
+    getRaw(),
+    currentRaw + ":root { --space: 2rem; }",
+    `glob ":root { --space: 2rem; }"`
+  );
+  glob`:root { --space: ${2}rem; }`;
+  t.equal(
+    getRaw(),
+    currentRaw + ":root { --space: 2rem; }",
+    `glob ":root { --space: 2rem; }" again`
+  );
+  glob`:root { --space: 25rem; }`;
+  t.equal(
+    getRaw(),
+    currentRaw + ":root { --space: 2rem; }" + ":root { --space: 25rem; }",
+    `glob ":root { --space: 25rem; }"`
+  );
   glob`hello `;
-  t.equal(getRaw(), currentRaw + "hello ", `glob "hello "`);
-  glob`hello${" "}`;
-  t.equal(getRaw(), currentRaw + "hello ", `glob "hello " again`);
-  glob`world`;
-  t.equal(getRaw(), currentRaw + "hello " + "world", `glob "world"`);
-  glob`hello `;
-  t.equal(getRaw(), currentRaw + "hello " + "world", `glob "hello " again 2`);
+  t.equal(
+    getRaw(),
+    currentRaw + ":root { --space: 2rem; }" + ":root { --space: 25rem; }",
+    `glob ":root { --space: 2rem; }" again 2`
+  );
   currentRaw = getRaw();
   glob`
   :root {

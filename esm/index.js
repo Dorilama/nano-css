@@ -68,10 +68,14 @@ export let glob = (template, ...values) => {
   // remove comments, double or more spaces, line feed
   str = str.replace(/\/\*.*?\*\/|\s{2,}|\n/gm, "");
   if (!str) return;
-  // if the str is in the cache it has been added already, there is nothing to do
-  if (cache[str]) return;
-  cache[str] = 1;
-  add(str);
+  let ruleset = /[^{]*{(?:[^{}]*{[^}]*})* *}|[^{]*{[^}]*}/g;
+  let match;
+  while ((match = ruleset.exec(str)) !== null) {
+    if (!cache[match[0]]) {
+      cache[match[0]] = 1;
+      add(match[0]);
+    }
+  }
 };
 
 /**
